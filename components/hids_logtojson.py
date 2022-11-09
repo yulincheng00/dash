@@ -1,0 +1,23 @@
+import pandas as pd
+import ast
+import json
+
+def log2json(path):
+    f = open(path,"r")
+    Lines = f.readlines()
+    jsons=[]
+    count = 0
+    # 轉換成正常JSON格式
+    for line in Lines:
+        count += 1
+        if "false" in line:
+            line = line.replace('false', "'false'")
+        if "true" in line:
+            line = line.replace('true', "'true'")
+        json_data = ast.literal_eval(line)
+        jsons.append(json_data)
+    #     print(json_data)
+    # print(jsons)
+
+    with open(path, "w") as f:
+        json.dump(jsons, f, indent = 4)
