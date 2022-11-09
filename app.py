@@ -11,7 +11,7 @@ from flask import send_from_directory
 
 import globals
 from components import navbar, menubar, hide_sidebar
-from pages import home, discover, security_events, non_exist, wazuh_logs, suricata_logs, AI_prediction, usb, add_agents, add_usb
+from pages import home, discover, security_events, non_exist, hids_logs, nids_logs, AI_prediction, usb, add_agents, add_usb
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
@@ -63,10 +63,10 @@ def display_page(pathname):
         layout = security_events.serve_layout(first)
         return layout
     elif pathname == '/Host_based/logs':
-        layout = wazuh_logs.serve_layout()
+        layout = hids_logs.serve_layout()
         return layout 
     elif pathname == '/Network_based/logs':
-        layout = suricata_logs.serve_layout()
+        layout = nids_logs.serve_layout()
         return layout
     elif pathname == '/AI_Prediction':
         layout = AI_prediction.serve_layout()
@@ -104,6 +104,7 @@ def serving_lottie_success():
     return send_from_directory(directory, "success.json")
 
 if __name__ == '__main__':
+    app.run_server(debug=True)
     # app.run_server(debug=True, dev_tools_props_check=False) # debug mode
     pid = os.fork()
     if pid != 0:
