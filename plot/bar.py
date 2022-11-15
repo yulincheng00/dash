@@ -5,7 +5,7 @@ from plot import donut
 from database import get_db
 from process_time import process_time
 
-def update(startDate, endDate, freqs, selected_fields):
+def update(startDate, endDate, freqs, selected_fields, id):
     # connect to database
     posts = get_db.connect_db()
 
@@ -35,7 +35,8 @@ def update(startDate, endDate, freqs, selected_fields):
 
     # 找到 startDate ~ endDate 之間的所有 data, 並轉成 data table 的形式
     data = posts.find({'$and':[{'timestamp':{"$gte":startDate}},
-                               {'timestamp':{"$lte":endDate}}]}, display_cols)
+                               {'timestamp':{"$lte":endDate}},
+                               {"agent.id":{"$eq":id}}]}, display_cols)
     df = pd.json_normalize(data)
 
     # 若 selected_fields 有 field 沒出現在 df 中 (代表該 field 在 query 後全為空值, 所以沒出現在 df 中)
@@ -59,7 +60,7 @@ def update(startDate, endDate, freqs, selected_fields):
 
     return fig, df
 
-def se_update(startDate, endDate, freqs, col_name, title, top_num):
+def se_update(startDate, endDate, freqs, col_name, title, top_num, id):
     # connect to database
     posts = get_db.connect_db()
 
@@ -76,13 +77,15 @@ def se_update(startDate, endDate, freqs, col_name, title, top_num):
         for j in range(1, len(intervals[:-1])):
             result = posts.count_documents({'$and':[{col_name: set_values[i]},
                                                     {'timestamp':{"$gte":intervals[j-1]}},
-                                                    {'timestamp':{"$lt":intervals[j]}}]})
+                                                    {'timestamp':{"$lt":intervals[j]}},
+                                                    {'rule.id':{"$eq":id}}]})
             cnt[i].append(result)
 
         # 特殊處理無法被完美切割的最後一個 interval
         result = posts.count_documents({'$and':[{col_name: set_values[i]},
                                                 {'timestamp':{"$gt":intervals[-2]}},
-                                                {'timestamp':{"$lte":intervals[-1]}}]})
+                                                {'timestamp':{"$lte":intervals[-1]}},
+                                                {'rule.id':{"$eq":id}}]})
         cnt[i].append(result)
 
     interval_title = process_time.interval_title

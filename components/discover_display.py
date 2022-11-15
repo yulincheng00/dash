@@ -10,7 +10,7 @@ global CONFIG
 
 BAR_STYLE = {'zIndex':1} #'border':'1px black solid', 
 
-def update(startDate, endDate, freqs):
+def update(startDate, endDate, freqs, id):
     global CONFIG
 
     # 若所選 fields 中沒有 timestamp, 則自動加入 timestamp 在最前面
@@ -23,7 +23,7 @@ def update(startDate, endDate, freqs):
 
     # 根據 selected_fields 篩選資料(若 fields 為空, table 顯示所有 fields)
     global df
-    bar_fig, df = bar.update(startDate, endDate, freqs, globals.selected_fields)
+    bar_fig, df = bar.update(startDate, endDate, freqs, globals.selected_fields, id)
 
     # 若無資料
     if len(df) == 0:

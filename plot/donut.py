@@ -13,7 +13,8 @@ def calculate_cnt(startDate, endDate, col_name):
     for value in set_values:
         result = posts.count_documents({'$and':[{col_name:{"$in": [value]}},
                                                 {'timestamp':{"$gte":startDate}},
-                                                {'timestamp':{"$lte":endDate}}]})
+                                                {'timestamp':{"$lte":endDate}},
+                                                {'rule.id':{"$eq":id}}]})
         cnt.append(result)
     return cnt, set_values
 

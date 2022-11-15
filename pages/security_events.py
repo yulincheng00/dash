@@ -1,13 +1,23 @@
 import dash_bootstrap_components as dbc
+import dash
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
 from dash_extensions import Lottie
-
+import feffery_antd_components as fac
 from process_time import process_time
 from components import datePicker, se_display, alert
+import globals
 
 options = dict(loop=True, autoplay=True, rendererSettings=dict(preserveAspectRatio='xMidYMid slice'))
-
+dropdown_style = {
+    "display":"inline-block",
+    "fontSize":20,
+    'width': '200px',
+    "position":"relative",
+    "left":"1rem",
+    "top":"1rem",
+    "bottom":"2rem"
+}
 DISPLAY_STYLE = {
     "transition": "margin-left .5s",
     "margin-top": 20,
@@ -15,7 +25,7 @@ DISPLAY_STYLE = {
     "margin-right": "4rem",
     "padding": "1rem 1rem",
     "background-color": "#f8f9fa",
-    "height":'7rem',
+    "height":'10rem',
     'fontSize': 10,
     'zIndex': 1,
     # 'border': '1px black solid',
@@ -41,7 +51,16 @@ def serve_layout(first):
                                     datePicker.se_date_picker(), # live update
                                     notification,
                                 ],
-                            )
+                            ),
+                            fac.AntdSelect(
+                                    id = 'seagentselect',
+                                    placeholder='Agent:',
+                                    options=[
+                                        {'label': 'Raspberry Pi', 'value': 'Raspberry Pi'},
+                                        {'label': 'PC', 'value': 'PC'},
+                                    ],
+                                    style=dropdown_style
+                            ),
                         ],
                         style=DISPLAY_STYLE,
                     ),
@@ -135,12 +154,17 @@ def serve_layout(first):
     ],
     [
         Input('se-submit_date', 'n_clicks'),
+        Input('seagentselect','value')
     ],
     [
         State('se-datetime-picker', 'value')
     ]
 )
-def update(n_clicks, time):
+def update(n_clicks, value, time):
     # 將 time 轉成 timestamp format, 並得到 interval
     startDate, endDate, freqs = process_time.get_time_info(time)
-    return se_display.update(startDate, endDate, freqs)
+    if(value=='Raspberry Pi'):
+        return se_display.update(startDate, endDate, freqs, globals.agent_pi_id)
+    elif(value=='PC'):
+        return se_display.update(startDate, endDate, freqs, globals.agent_pc_id)
+    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update

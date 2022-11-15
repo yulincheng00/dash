@@ -49,9 +49,9 @@ SECOND_STYLE = {
     'zIndex':1,
 }
 
-def update(startDate, endDate, freqs):
+def update(startDate, endDate, freqs, id):
     # get chart
-    area_fig = area.update(startDate, endDate, 'rule.level', freqs, 'Alert level evolution')
+    area_fig = area.update(startDate, endDate, 'rule.level', freqs, 'Alert level evolution',id)
 
     # 若無資料
     if len(area_fig.data) == 0:
@@ -62,10 +62,10 @@ def update(startDate, endDate, freqs):
         return no_data
 
     # 若有資料
-    donut_mitre_fig = donut.update(startDate, endDate, 'rule.mitre.technique', mitre_title, mitre_topNum)
+    donut_mitre_fig = donut.update(startDate, endDate, 'rule.mitre.technique', mitre_title, mitre_topNum, id)
     donut_mitre_fig.update_layout(legend=dict(x=1.2)) # legend 會擋到 label, 故往右移
-    donut_agent_fig = donut.update(startDate, endDate, 'agent.name', donut_agent_title, agent_topNum)
-    bar_agent_fig = bar.se_update(startDate, endDate, freqs, 'agent.name', bar_agent_title, agent_topNum)
+    donut_agent_fig = donut.update(startDate, endDate, 'agent.name', donut_agent_title, agent_topNum, id)
+    bar_agent_fig = bar.se_update(startDate, endDate, freqs, 'agent.name', bar_agent_title, agent_topNum, id)
 
     area_graph = dcc.Graph(
         figure=area_fig,
@@ -97,18 +97,22 @@ def update(startDate, endDate, freqs):
     # get num
     posts = get_db.connect_db()
     total = posts.count_documents({'$and':[{'timestamp': {"$gte":startDate}},
-                                           {'timestamp': {"$lte":endDate}}]})
+                                           {'timestamp': {"$lte":endDate}},
+                                           {'rule.id':{"$eq":id}}]})
 
     level12 = posts.count_documents({'$and':[{'timestamp': {"$gte":startDate}},
                                              {'timestamp': {"$lte":endDate}},
+                                             {'rule.id':{"$eq":id}},
                                              {'rule.level': {"$gte":12}}]})
 
     fail = posts.count_documents({'$and':[{'timestamp': {"$gte":startDate}},
                                           {'timestamp': {"$lte":endDate}},
+                                          {'rule.id':{"$eq":id}},
                                           {'rule.groups': 'authentication_failed'}]})
 
     success = posts.count_documents({'$and':[{'timestamp': {"$gte":startDate}},
                                              {'timestamp': {"$lte":endDate}},
+                                             {'rule.id':{"$eq":id}},
                                              {'rule.groups': 'authentication_success'}]})
 
     return [f'從 {startDate} 到 {endDate}', total, level12, fail, success, first_row, second_row]

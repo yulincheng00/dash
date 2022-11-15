@@ -1,10 +1,20 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State, ALL
-
+import feffery_antd_components as fac
 from process_time import process_time
+import dash
+import globals
 from components import fields, datePicker, discover_display, collapse_item, alert
-
+dropdown_style = {
+    "display":"inline-block",
+    "fontSize":20,
+    'width': '200px',
+    "position":"relative",
+    "left":"1rem",
+    "top":"1rem",
+    "bottom":"2rem"
+}
 # components
 hitNum = html.H1(
     [
@@ -34,14 +44,25 @@ def serve_layout(first):
             dbc.Row(
                 [
                     fields.serve_fields(),
+
                     dbc.Col(
                         [
                             dbc.Row(
                                 [
                                     datePicker.discover_date_picker(),   # live update
                                     notification #,style={'margin-right':'3rem'}
-                                ]
+                                ],
                             ),
+                            fac.AntdSelect(
+                                id = 'dagentselect',
+                                placeholder='Agent:',
+                                options=[
+                                    {'label': 'Raspberry Pi', 'value': 'Raspberry Pi'},
+                                    {'label': 'PC', 'value': 'PC'},
+                                ],
+                                style=dropdown_style
+                            ),
+                            
                             dcc.Loading(
                                 html.Div(
                                     [
@@ -70,12 +91,17 @@ def serve_layout(first):
         Input('submit_date', 'n_clicks'),
         Input({'type': 'add_btn', 'index': ALL}, 'n_clicks'),
         Input({'type': 'del_btn', 'index': ALL}, 'n_clicks'),
+        Input('dagentselect', 'value'),
     ],
     [
-        State('datetime-picker', 'value')
+        State('datetime-picker', 'value'),
     ]
 )
-def update(n_clicks, add_btn, del_btns, time):
+def update(n_clicks, add_btn, del_btns, value, time): #,dagentselect
     # 將 time 轉成 timestamp format, 並得到 interval
     startDate, endDate, freqs = process_time.get_time_info(time)
-    return discover_display.update(startDate, endDate, freqs)
+    if(value=='Raspberry Pi'):
+        return discover_display.update(startDate, endDate, freqs, globals.agent_pi_id)
+    elif(value=='PC'):
+        return discover_display.update(startDate, endDate, freqs, globals.agent_pc_id)
+    return dash.no_update, dash.no_update, dash.no_update

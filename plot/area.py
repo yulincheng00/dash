@@ -4,7 +4,7 @@ import plotly.express as px
 from database import get_db
 from process_time import process_time
 
-def update(startDate, endDate, col_name, freqs, title):
+def update(startDate, endDate, col_name, freqs, title, id):
     interval_title = process_time.interval_title
     drop_null = {col_name:{"$exists": True}}
     display_cols = {'_id':0, col_name:1}
@@ -26,13 +26,15 @@ def update(startDate, endDate, col_name, freqs, title):
         for value in set_values:
             result = posts.count_documents({'$and':[{'timestamp':{"$gte":intervals[i-1]}},
                                                     {'timestamp':{"$lt":intervals[i]}},
-                                                    {col_name:value}]})
+                                                    {col_name:value},
+                                                    {'rule.id':{"$eq":id}}]})
             cnt[dic[value]].append(result)
 
     for value in set_values:
         result = posts.count_documents({'$and':[{'timestamp':{"$gt":intervals[-2]}},
                                                 {'timestamp':{"$lte":intervals[-1]}},
-                                                {col_name:value}]})
+                                                {col_name:value},
+                                                {'rule.id':{"$eq":id}}]})
         cnt[dic[value]].append(result)
 
     # 去除資料個數為零的
