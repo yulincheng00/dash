@@ -86,6 +86,24 @@ sidebar = html.Div(
                                             {
                                                 'component': 'Item',
                                                 'props': {
+                                                    'key': '/Network_based/History',
+                                                    'title': 'History',
+                                                    'icon':'antd-history',
+                                                    'href': '/Network_based/History'
+                                                },
+                                            },
+                                            {
+                                                'component': 'Item',
+                                                'props': {
+                                                    'key': '/Network_based/Statistics',
+                                                    'title': 'Statistics',
+                                                    'icon':'antd-bar-chart',
+                                                    'href': '/Network_based/Statistics'
+                                                },
+                                            },
+                                            {
+                                                'component': 'Item',
+                                                'props': {
                                                     'key': '/Network_based/logs',
                                                     'title': 'Events Logs',
                                                     'icon':'antd-file-protect',
@@ -105,7 +123,7 @@ sidebar = html.Div(
                                     {
                                         'component': 'Item',
                                         'props': {  'key':  '/USB',
-                                                    'title': 'USB B/W list',
+                                                    'title': 'USB logs',
                                                     'icon': 'antd-database',
                                                     'href':'/USB'
                                                 }
